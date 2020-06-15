@@ -92,8 +92,6 @@ function getFields(resource) {
   .setName('Id')
   .setType(types.TEXT);
   
-  
-  
   if(resource == DiagnosticReport){
     
     fields
@@ -164,7 +162,7 @@ function getData(request) {
     prepareForDiagnosticReport(request, entries, schema, rows);
 
     
-    console.log(rows);
+    
     
     var result = {
       schema: schema,
@@ -218,9 +216,9 @@ function includeRowItem(entry, name, values){
    case conclusion:
     values.push(entry.resource.conclusion);
    break;
-//   case observation_type:
-//    values.push(entry.resource.code.text);
-//   break;
+   case observation_type:
+    values.push(entry.resource.code.text);
+   break;
    case value:
     if(entry.resource.hasOwnProperty("valueQuantity")){
       values.push(entry.resource.valueQuantity.value.toString());
@@ -255,11 +253,13 @@ function fetchDataFromApi(request) {
   var options = {
     'method' : 'POST',
     'headers': JSON.parse(request.configParams.headers),
-    'payload' : data
+    'payload' : data,
+    'muteHttpExceptions': true
   };
   
   var response = UrlFetchApp.fetch(request.configParams.url + '/' + request.configParams.resource + '/_search', options);
-  
+//  console.log(response.getResponseCode());
+//  console.log(response.getContentText());
   return response;
 }
 
