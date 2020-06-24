@@ -7,6 +7,9 @@ var conclusion = "conclusion";
 var observation_type = "observation_type";
 var value = "value";
 var unit = "unit";
+var ref_country = "reference_country";
+var ref_state = "reference_state";
+var ref_city = "reference_city";
 
 
 var cc = DataStudioApp.createCommunityConnector();
@@ -121,6 +124,12 @@ function getFields(resource) {
     
     fields
     .newDimension()
+    .setId(issued_date)
+    .setName('Issued Date')
+    .setType(types.TEXT);
+    
+    fields
+    .newDimension()
     .setId(value)
     .setName('Value')
     .setType(types.TEXT);
@@ -129,6 +138,24 @@ function getFields(resource) {
     .newDimension()
     .setId(unit)
     .setName('Unit')
+    .setType(types.TEXT);
+    
+    fields
+    .newDimension()
+    .setId(ref_country)
+    .setName('Country')
+    .setType(types.TEXT);
+    
+    fields
+    .newDimension()
+    .setId(ref_state)
+    .setName('State')
+    .setType(types.TEXT);
+    
+    fields
+    .newDimension()
+    .setId(ref_city)
+    .setName('City')
     .setType(types.TEXT);
   }
   
@@ -160,7 +187,6 @@ function getData(request) {
     
     
     prepareForDiagnosticReport(request, entries, schema, rows);
-
     
     
     
@@ -189,7 +215,6 @@ function prepareForDiagnosticReport(request, entries, schema, rows){
    schema.push(getItemFromDefaultSchema(defaultSchema, request, field.name));
   });
   
-  
   var values;
   entries.forEach(entry => {
     values = [];
@@ -217,7 +242,22 @@ function includeRowItem(entry, name, values){
     values.push(entry.resource.conclusion);
    break;
    case observation_type:
-    values.push(entry.resource.code.text);
+      if(entry.resource.code.text != null){
+        values.push(entry.resource.code.text);
+      }
+      else{
+        values.push(entry.resource.code.coding[0].display);
+      }
+   break;
+   case ref_country:
+      console.log(entry.resource.extension[1].valueString);
+    values.push(entry.resource.extension[1].valueString);
+   break;
+   case ref_state:
+    values.push(entry.resource.extension[2].valueString);
+   break;
+   case ref_city:
+    values.push(entry.resource.extension[3].valueString);
    break;
    case value:
     if(entry.resource.hasOwnProperty("valueQuantity")){
